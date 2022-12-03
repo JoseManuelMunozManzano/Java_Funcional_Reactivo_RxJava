@@ -1,0 +1,31 @@
+@startuml
+
+    interface Product {
+        + operation()
+    }
+
+    class ProductFactory {
+        + factoryMethod()
+    }
+
+    class Client {
+        + main()
+    }
+
+    class ConcreteProduct1 {
+        + operation()
+    }
+
+    class ConcreteProduct2 {
+        + operation()
+    }
+
+    class ConcreteProduct3 {
+        + operation()
+    }
+
+    ProductFactory ..> Product : <<creates>>
+    Client --> ProductFactory : <<asks>>
+    Product <|-- ConcreteProduct1
+
+@enduml

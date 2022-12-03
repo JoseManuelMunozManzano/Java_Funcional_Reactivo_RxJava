@@ -1,0 +1,25 @@
+@startuml
+
+    class Director {
+        + createObject(Builder builder)
+    }
+
+    interface Builder {
+        + buildPiece(1)
+        + buildPiece(2)
+        + getCompleteProduct()
+    }
+
+    class ConcreteBuilder {
+        + buildPiece(1)
+        + buildPiece(2)
+        + getCompleteObject()
+    }
+
+    class Product
+
+    Director o-- Builder
+    Builder <|-- ConcreteBuilder
+    ConcreteBuilder ..|> Product : creates
+
+@enduml

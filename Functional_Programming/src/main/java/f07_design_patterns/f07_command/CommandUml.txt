@@ -1,0 +1,29 @@
+@startuml
+
+    class Invoker
+
+    interface Command {
+        + execute(void)
+    }
+
+    class Receiver {
+        + action()
+    }
+
+    class ConcreteCommand1 {
+        + execute()
+    }
+
+    class ConcreteCommand2 {
+        + execute()
+    }
+
+    class ConcreteCommand3 {
+        + execute()
+    }
+
+    Command <--* Invoker
+    ConcreteCommand1 --> Receiver
+    Command <|-- ConcreteCommand1
+
+@enduml

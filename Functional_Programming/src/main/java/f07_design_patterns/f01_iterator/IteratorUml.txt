@@ -1,0 +1,27 @@
+@startuml
+
+    class Collection {
+        + iterator()
+    }
+
+    class Iterator {
+        + next()
+        + hasNext()
+    }
+
+    class ConcreteCollection {
+        + iterator()
+    }
+
+    class ConcreteIterator {
+        + next()
+        + hasNext()
+    }
+
+    Collection ..> Iterator : <<creates>>
+    Collection <|-- ConcreteCollection
+    Iterator <|-- ConcreteIterator
+    ConcreteCollection ..> ConcreteIterator : <<creates>>
+    ConcreteIterator o-- ConcreteCollection
+
+@enduml

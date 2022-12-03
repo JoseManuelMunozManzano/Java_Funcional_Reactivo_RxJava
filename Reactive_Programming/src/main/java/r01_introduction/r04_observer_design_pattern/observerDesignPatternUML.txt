@@ -1,0 +1,29 @@
+@startuml
+
+    interface Subject {
+        + registerObserver(Observer)
+        + removeObserver(Observer)
+        + notifyObserver()
+    }
+
+    interface Observer {
+        + update()
+    }
+
+    class ConcreteObserver {
+        + update()
+    }
+
+    class ConcreteSubject {
+        + registerObserver(Observer)
+        + removeObserver(Observer)
+        + notifyObserver()
+        ..more methods..
+    }
+
+    Subject --> Observer :observer 1...*
+    ConcreteObserver --> Observer
+    ConcreteObserver --> ConcreteSubject
+    ConcreteSubject --> Subject
+
+@enduml

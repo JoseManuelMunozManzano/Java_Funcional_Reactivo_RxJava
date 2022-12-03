@@ -1,0 +1,701 @@
+GIT
+---
+
+1) Configuración
+  git config --global user.name "José Manuel Muñoz Manzano"
+  git config --global user.email "neil_mercury@yahoo.es"
+
+  git config -l
+
+  Para editar la configuración
+  Tecla a para modificar y luego :wq! para grabar y salir inmediatamente
+  git config --global -e
+
+2) Inicialización de repositorio local
+  Crea carpeta .git que contiene la referencia a todo lo que se vaya a hacer en el repositorio
+  No borra commits anteriores si ya existía la carpeta .git
+  git init
+
+3) Estado de los commits, de lo que se modificó, de lo que está en el stage y de la rama en la que nos encontramos
+  git status
+
+  Resumen
+  git status --short
+
+  Resumen pero indicando el branch en el que estamos
+  git status --short -b
+  ó
+  git status -sb
+
+4) Dar seguimiento a los cambios. Subir al stage (staging area)
+  A archivos en concreto
+  git add <file1> <file2> <file3>
+
+  A un archivo en concreto que está en una carpeta
+  git add carpeta/file1
+
+  A todo
+  git add .
+
+5) Dejar de seguir un cambio que se acaba de añadir al stage. Quitar del stage
+  Todo
+  git reset
+
+  Un fichero en concreto
+  git reset <file>
+
+  Echa atrás un commit pero no elimina los cambios realizados
+  El ^ indica el último commit antes del HEAD
+  El HEAD podría ser reemplazado por el hash de un commit
+  git reset --soft HEAD^
+
+  Si quisiera 3 commits anteriores
+  git reset --soft HEAD^3
+
+6) Tomar la "fotografía" (commit)
+  Ahora podemos hacer "viajes en el tiempo", es decir crea registros históricos de los cambios de los ficheros
+  que están en el stage en ese momento.
+  Hay que hacer commits cada vez que se haga una funcionalidad importante
+  git commit -m "Primer commit
+
+7) Recuperar el proyecto como estaba en el commit anterior
+  Solo se recupera la información de los archivos a los que se les estaba haciendo seguimiento
+  git checkout -- .  
+
+  Recuperar el fichero como estaba en un commit anterior. Sólo ese fichero
+  git checkout <hash_commit> <nombre_fichero>
+
+  Recuperar ficheros como estaban en otros commits
+  git checkout <hash_commit>
+  El hash se conoce con git log
+
+8) Saber la rama en la que estamos trabajando
+  git branch
+
+  Saber todas las ramas que se encuentran en el repositorio. Salen las nuestras y las que no hemos participado.
+  git branch -a   
+
+9) Cambiar nombre de la rama master a main
+  Sólo lo cambia para este proyecto
+  git branch -m master main
+
+  Para que cuando se cree un proyecto lo cree con rama main en vez de master
+  git config --global init.defaultBranch main
+
+10) Atajo para hacer add . y commit a la vez
+  Sólo funciona si ya se le está haciendo seguimiento al archivo. Si el archivo estuviera con la U (untrack)
+  entonces hay que hacer primero git add . y luego el commit.
+  git commit -am "Texto del commit"
+
+11) Logs del repositorio
+  git log
+
+  Log corto:
+  git log --oneline
+
+  Log para ver uniones con otras ramas, con gråficos
+  git log --oneline --decorate --all --graph
+
+12) Agrupar ficheros untracked y añadirlos al stage para hacer distintos commits
+  git add *.html
+
+  git add js/*.js
+
+  Para tomar todo lo que se encuentra en el directorio css y sus subdirectorios también
+  git add css/
+
+  Para sacar del stage cuando todavía no se les está haciendo seguimiento:
+  git restore --staged <file>
+
+13) Carpeta sin ficheros
+  Para que git lo ponga como untrack, crear dentro de esa carpeta (por ejemplo uploads) sin ficheros un fichero llamado
+  .gitkeep
+
+  Y para añadirlo al stage area
+  git add uploads/.gitkeep
+
+14) Alias
+  En este caso nuestro alias es la consonante s, y lo que hace es status -sb
+  git config --global alias.s "status -sb"
+
+  Otro alias
+  git config --global alias.lg "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
+
+15) El HEAD apunta al último commit de la rama en la que nos encontramos (la que está cargada)
+
+16) Cambios en los archivos
+  Para saber que se ha modificado (no se ha subido al stage)
+  git diff
+
+  Especificando archivo (no se ha subido al stage)
+  git diff <archivo>
+
+  Ver los cambios cuando el archivo se ha subido al stage
+  git diff --staged
+
+  Es mucho más útil usar VS Code para ver los cambios, porque estos se ven línea contra línea.
+
+17) Actualizar mensaje del commit y revertir commits
+  Una vez hecho el commit, si quiero cambiar el descriptivo se puede hacer de varias formas:
+
+  Para el último commit:
+  git commit --amend -m "El descriptivo correcto"
+
+  Se hace un cambio que debería haber sido parte del commit ya realizado:
+  * Se puede hacer otro commit
+  * Hacer un reset --soft al commit necesario y luego de nuevo el commit
+    git reset --soft HEAD^
+    git add .
+    git commit -m "Nuevo descriptivo"
+
+  * Tras hacer un git log (o el alias creado git lg), podemos tomar el hash corto del penúltimo commit y hacer un reset.
+    git reset --soft fc6aaac
+    git commit -am "Descriptivo correcto"
+
+  * Si hemos hecho algunos commits y decidimos que no deberian de haberse integrado, podemos acceder al hash de los
+    commits al que queramos movernos con git log (o el alias git lg) y escribir el comando:
+    git reset --mixed 745ea33
+
+    --mixed, al igual que --soft, no es destructivo, pero saca del stage y los cambios quedan listos para que se puedan
+    volver a añadir, es decir, los cambios siguen ahí tras ejecutar el mandato.
+    Si ahora volvemos a ejecutar git lg, veremos que ya no están los commits posteriores al ejecutado y el (HEAD -> main) 
+    también se ha actualizado.
+    --mixed es el valor de reset por defecto.
+
+  * Si resulta que todos esos cambios realmente hay que desecharlos:
+    git reset --hard 745ea33
+
+    El (HEAD -> main) también se ha actualizado.
+    Cuidado con el --hard porque aunque se pueda recuperar, ya es destructivo. Se deja todo el repositorio como estaba en ese
+    punto.    
+
+  Lo mejor es no tocar commits, pero si es obligatorio, es recomendable usar el amend o un rebase interactivo.
+  Si el repositorio tiene mucha historia o se ha hecho un push a un repositorio externo, entonces no es recomendable 
+  tocar los commits, porque puede haber conflictos.
+
+  * El revert como tal lo que hace es revertir los cambios que fueron hechos por ese commit. No todos los cambios desde ese commit,
+    sino los cambios definidos EN ESE commit con ese id. Es muy importante indicar que git revert <id> no borra el commit que se
+    quiere revertir, sino que añade un nuevo commit que incluye todos los cambios que tienen que hacerse para deshacer los cambios
+    del otro commit.
+    git revert <id>
+
+18) Posible error/warning
+  warning: LF will be replaced by CRLF in <file>
+
+  Para corregirlo:
+  git config core.autocrlf true
+
+19) reflog
+  Si hemos hecho git reset --hard (o --soft o --mixed) y queremos volver a recuperar lo que había anteriormente 
+  se usa el comando:
+  git reflog
+
+  Es un log de referencias de todo lo que ha ido ocurriendo en orden cronológico. Ahí aparece el hash del commit al que
+  queremos regresar.
+
+  Para regresar cogemos el hash del commit al que queremos volver y escribimos:
+  git reset --hard d425fb7
+
+  Este uso de git no es algo del día a día. Usualmente si se va a implementar una nueva funcionalidad de la que no estamos
+  seguros que se vaya a integrar, lo mejor es hacer una nueva rama que se mantendrá mientras estemos desarrollando.
+  Cuando la implementación esté lista, uniremos esa rama con la rama main (o master)
+  El uso de ramas evita el tener que estar jugando con los cambios en el tiempo, y que otros desarrolladores sufran 
+  al movernos por el tiempo del desarrollo del proyecto.
+  Por eso se busca que el main o master sólo tenga los commits definitivos.
+
+20) Cambiar nombre y eliminar archivos mediante git
+  git mv <fichero> <nuevo_nombre>
+
+  mv, aunque es de move, si se mueve en la misma carpeta es como renombrarlo.
+  Cuando se ejecuta el comando en VS Code, junto a ese archivo aparecerá una R de rename.
+  Con git status (o el alias git s) aparece que se ha hecho el rename y ya está en el stage.
+
+  Para eliminar el archivo desde git:
+  git rm <archivo>
+
+  Si ahora se hace un git status (o alias git s) vemos que aparece ese archivo con la D de deleted. 
+  Todavía está en el stage.
+  Si ahora se hiciera un git reset --hard se recuperaría ese fichero recien borrado.
+  Para marcarlo como eliminado: git commit -m "descripción"
+
+21) Cambiar nombre y eliminar archivos fuera de git
+  Es lo que se va a hacer en el día a día.
+  Se cambia el nombre "físicamente" y aparecerá untracked.
+  Si se hace git status (o alias git s) aparecerá una D en el nombre anterior (se eliminó)
+  El  problema que hay con esto es que se puede perder el historial de cambios del archivo. Por eso se suele preferir hacer 
+  lo que se indica en 20)
+  Pero si se hace git add . entonces vemos que, tras git s, git le pone una R (renamed). Si no le pone la R entonces si se puede
+  utilizar la opción 20)
+
+  La eliminación de archivos es tan fácil como borrar "físicamente" el archivo. Como está registrado en git, al hacer git s
+  veremos una D en ese archivo, pero a diferencia del comando git rm, no está en el stage.
+  Tras git add . se añade al stage y ya se podría hacer el commit.
+
+22) Ignorando archivos no deseados
+  Se crea el archivo .gitignore usualmente la raiz de la carpeta del proyecto y se indican todos los archivos y directorios a 
+  los que no se les va a realizar el seguimiento.
+
+23) Crear rama
+  git branch <nombre_rama>
+
+24) Ver ramas
+  git branch
+
+  Donde aparezca el * es donde estamos
+
+25) Ir a una rama una vez esta existe
+  git checkout <nombre_rama>
+
+  Ahora, tras git branch veremos que el * aparece en el nombre de la rama informado al que hacemos el checkout.
+  Si hacemos un git lg, veremos que el HEAD apunta tanto a la rama master (o main) como <nombre_rama>, es decir, están
+  parados en el mismo punto del tiempo y ese es el último commit de ambas.
+
+  Si se hace ahora un git commit veremos que la rama master empieza a quedar atrás.
+
+  Si queremos volver a la rama master:
+  git checkout master
+
+26) Crear una rama y moverse a ella automáticamente
+  git checkout -b <nombre_rama>
+
+27) Merge - Fast-Forward
+  Para hacer que los commits pertenecientes a <nombre_rama> se integren en la rama master, una vez hemos decidido que los
+  cambios si van a formar parte del proyecto, lo primero es ir a la rama que va a RECIBIR LOS NUEVOS CAMBIOS.
+  git checkout master
+
+  Ahora se hace el merge
+  git merge <nombre_rama>
+
+  Fast-forward es lo mejor que nos puede pasar. Significa que git logró identificar cada uno de los cambios y no hay conflictos.
+  Si se escribe git lg, veremos que de nuevo HEAD apunta tanto al master como a <nombre_rama>
+  Una vez terminada la rama, se puede borrar.
+
+28) Borrar ramas
+  git branch -d <nombre_rama>
+
+  Si hubiera algunas modificaciones en la rama que no se han unido a ninguna otra rama, git nos lo avisa.
+  Si estamos seguros de borrarla, podemos forzarla con:
+  git branch -d <nombre_rama> -f
+
+29) Merge - Unión automática
+  Si estamos en una rama que está adelantada con respecto al master (hay cambios ya agregados con commit) y de repente nos
+  dicen que hay que hacer un cambio rápido que hay que subir ya, si nuestra rama todavía no está lista para ser unida, nos
+  pasaremos al master con git ckeckout master (o main) 
+  Al hacer esto perderemos del código lo que haya de nuevo en la rama.
+
+  Si ahora modificamos un código de otro fichero distinto (o son otras líneas del mismo fichero, vamos que no hay conflicto)
+  y agregamos en la rama master (o main) esos cambios, tendremos cambios en la rama master, esta habrá avanzado en su línea del
+  tiempo.
+  Además nuestra rama <nombre_rama> avanzó por su lado en su propia línea del tiempo.
+
+  Si llega el momento de unificar la rama con el master (o main), accederemos a la rama la cual espera los cambios de otra
+  rama. Si queremos estar en la rama master y traer los cambios de la rama <nombre_rama>, lo primero es hacer, si no estamos 
+  en master, git checkout master
+
+  Y ahora se ejecutará el comando:
+  git merge <nombre_rama>
+
+  git me pedirá que ponga el texto de un nuevo commit que una ambas ramas (presionar a para poder escribir) y dejar/modificar 
+  el texto del commit que ya nos pone git. Una vez lo tengamos, escribiremos en el editor vi: 
+  Esc :wq!
+
+  La unión no la hace por fast-forward, sino que usa una estrategia recursiva. Analiza los cambios y los une. Esto sólo lo
+  va a hacer si no hay conflictos.
+
+30) Merge - Uniones con conflictos
+  Un conflicto ocurre cuando tras tocar código, git no es capaz de unirlo de manera automática o de hacer el fast-forward.
+  Cuando git tiene dudas, indica que se haga la unión de manera manual.
+
+  Generalmente ocurre cuando en una rama se toca una línea y en la rama master (o main) se toca la misma línea, y al intentar
+  hacer el merge git no sabe que versión tiene que dejar y cual desechar. Es más, a lo mejor necesitamos las dos versiones.
+
+  Una vez estamos en el master: git checkout master
+  Cuando se intenta hacer el merge: git merge <nombre_rama> 
+
+  Aparecerá un texto indicando:
+  CONFLICTO (contenido): Conflicto de fusión en <todos_los_ficheros_con_conflicto>
+  Fusión automática falló; arregle los conflictos y luego realice un commit con el resultado.
+
+  Y en VSCode (y cualquier otro editor de texto) aparecerán físicamente los textos original y nuevos. 
+  Además en VSCode aparecerá al lado del nombre del archivo un ! indicando que hay conflictos que resolver. No desaparecerá 
+  hasta que se haga el commit.
+  Si escribimos git s (el alias de git status) veremos el/los ficheros con UU que indica conflictos en la unión.
+
+  Una vez modificado el/los ficheros con conflicto indicados, tal y como indica git habrá que hacer un commit para resolver
+  por completo el conflicto.
+
+  Nota: Los archivos que no den conflicto pasarán sin ningún inconveniente.
+
+31) Tags - Etiquetas
+  Son una referencia a un commit y a todo el estado del proyecto en ese punto específico.
+  Suelen usarse para marcar versiones o releases de nuestros programas.
+
+  Para ver los tags existentes en nuestro proyecto:
+  git tag  
+
+  Para crear un tag hay varias formas:
+  * Nombre de tag
+    git tag <nombre_tag>
+
+    Si ahora hacemos git lg se puede ver (HEAD -> master, tag: <nombre_tag>)
+    El tag siempre apuntará a ese commit, aunque el HEAD y el master avancen.
+
+    Podremos movernos en el tiempo usando los tags (git reset, git checkout)
+
+    Para eliminar un tag:
+    git tag -d <nombre_tag>
+  
+  * Versionamiento semántico
+    Es lo que suele usarse para trabajar con tags.
+    Para crear una release tag:
+    git tag -a v1.0.0 -m "Version 1.0.0 lista"
+
+    Con este comando, donde esté el HEAD en ese momento se creará el tag.
+    Si ahora hacemos git lg se puede ver (HEAD -> master, tag: v1.0.0)    
+
+    Si queremos añadir un tag en un punto del tiempo donde no estemos parados (un commit anterior)
+    git lg y copiamos el hash del commit deseado (o usamos ^ o HEAD...)
+    git tag -a v0.1.0 27c62b3 -m "Version Alpha de nuestra app"
+
+    Para ver más información sobre un tag específico:
+    git show <version>
+
+32) Stash
+  Es una bóveda segura donde se pueden mover todos los cambios, inclusive cambios a archivos a los que git todavía no le da
+  seguimiento (no hay commit), desde el último commit.
+  Vale cuando en una rama estamos haciendo cambios y se pide desplegar todos los cambios que hay en la rama, pero hay cambios
+  que todavía no se han unido a la rama, o hay trabajo que todavía no quiere que se impacte, vamos que no se ha hecho commit
+  todavía.
+
+  Al hacer el git stash regresamos al último punto donde se encuentra HEAD en la rama en la que estamos trabajando.
+  Se hacen las modificaciones y luego le podemos decir a git que necesitamos regresar al trabajo tal y como lo tenemos en
+  la bóveda.
+
+  No es recomendable que hayas muchas características distintas en el stash. Lo suyo es estar trabajando en una característica,
+  llevarlo al stash (si hace falta) y tan pronto se puede regresar la información del stash y seguir trabajando con esos
+  cambios.
+  Si no va a ser muy difícil acordarse de que eran cada uno de los stash (a pesar de que se les puede poner nombre)
+  El último stash añadido tiene el valor (o una especie de hash) stash@{0}, el penúltimo stash@{1} y así...
+
+  El mandato que se usa es (tras hacer el cambio en el código PERO SIN HACER COMMIT NI PASAR AL STAGE SIQUIERA)
+  git stash
+
+  Aparecerå un texto indicando: Directorio de trabajo y estado de índice WIP on master: 5440fe5 Resolviendo conflictos guardados
+  WIP: Work In Progress
+
+  Si ahora hacemos un git lg veremos que aparece la referencia del stash. Además veremos que el archivo modificado aparece sin
+  esos cambios y si hacemos git s veremos que no hay nada que añadir al stage.
+
+  Para ver la lista de stash que tenemos:
+  git stash list
+
+  Para recuperar el trabajo desde un stash:
+  git stash pop
+  Va a recuperar el stash y va a dejar los cambios tal y como estaban en el stash pero también va a dejar los cambios a los que
+  se les hizo seguimiento después. También elimina el stash, con lo que si se hace un git lg no lo veremos.
+  Ahora se puede hacer el commit de los cambios que se han cogido del stash.
+
+  Conflictos en el stash:
+    git puede hacer automerging con git stash pop si modifico el mismo fichero en el que tengo cambios no commiteados en 
+    el stash, pero esos cambios no afectan a las mismas líneas. Git recupera el texto del stash y mantiene el nuevo texto
+    al que si se le hizo commit.
+
+    Si guardo en el stash un cambio (recordar, sin el commit) y sigo trabajando en mi rama normalmente y cambio la misma línea
+    y hago un commit, cuando luego hago git stash pop tendré un conflicto. Es muy similar a los conflictos en merge y se 
+    solucionan igual, dejando el código deseado y haciendo un commit. Como en este caso NO se borra el stash automáticamente,
+    para borrarlo dejando ignorados esos cambios hay que usar:
+    git stash clear
+
+    Dejar claro que git stash clear borra TODOS los stash. Si se necesitara recuperar alguno recordar que con git reflog
+    tenemos todos los hash y se podrían recuperar.
+    Es muy importante hacer el git stash clear para no dejar stash sueltos, porque pasado un tiempo es casi imposible
+    acordarse de lo que se hizo.
+
+  Stash avanzado:
+  https://git-scm.com/docs/git-stash
+
+    Si tenemos varios stash y queremos recuperar el antepenúltimo por ejemplo, usar:
+    git stash apply stash@{2}
+    Y si no es el que realmente queríamos recuperar lo podemos volver a poner en el stash con git stash, pero lo que hace es
+    crear un stash nuevo, el stash@{0}. Esto ocurre por no usar git stash pop
+    Esto es bastante incómodo porque no se que cambios hay en cada stash.
+
+    Si ahora quiero borrar ese stash@{0}
+    git stash drop stash@{0}
+    Aunque para el primero no haría falta poner su hash y se podría escribir: git stash drop
+
+    Para ver información sobre un stash en particular, usar show y el hash del stash deseado:
+    git stash show stash@{1}
+    Muestra en que fichero se ha hecho el cambio pero no mucho más. Sigue siendo incómodo.
+
+    Se puede poner un descriptivo al stash de esta forma:
+    git stash save "texto descriptivo"
+    Ahora con git stash list podemos ver ese descriptivo.
+
+    Para ver más información de los stash:
+    git stash list --stat
+
+
+  NOTA: Trabajando con ramas podemos más o menos evitar trabajar con el stash y es mejor.
+
+33) Rebase
+  Es muy poderoso y hay que tener mucho cuidado con el.
+  Permite unir y separar commits, renombrar el nombre de los commits...
+  Es recomendable usar el rebase sólo cuando los cambios no han impactado el repositorio externo o no han subido los cambios
+  a otro repositorio, porque muchas personas pueden estar trabajando en el mismo proyecto, o nosotros mismos en otro ordenador,
+  y si empezamos a cambiar la línea del tiempo esto acabará causando conflictos que van a ser más difíciles de resolver.
+
+  El caso sería el siguiente:
+  Tenemos nuestra rama master y tenemos un commit.
+  Creamos una rama (rama_A) en la que tenemos dos commits.
+  Otro compañero crea, en la rama master, 2 commits adicionales. 
+  Estos 2 commits también son necesarios para la rama_A.
+
+  Cómo se puede actualizar nuestra rama_A?
+  Nos movemos a nuestra rama_A
+  git checkout rama_A
+
+  Usamos el rebase
+  git rebase master
+
+  Este último comando crea un area temporal donde se van a mover los dos commits de la rama_A.
+  Se va a mover el puntero de la rama_A después del último commit de la rama master.
+  Regresan los dos commits del area temporal a la línea del tiempo principal, quedando master (o main) donde estaba
+  y el HEAD apunta a rama_A.
+
+  Rebase interactivo
+  git rebase -i HEAD~3
+  En este caso se está apuntando a HEAD y se quiere 3 commits antes. No tiene por qué ser el HEAD, puede ser cualquier
+  hash de un commit.
+  Lo que hará será crear un area temporal donde va a mover los últimos 3 commits en ese mismo orden y luego los va a regresar
+  igual a como fueron ingresados en el area temporal.
+
+  Para qué sirve esto?
+  - Ordenar commits
+  - Corregir mensajes de los commits
+  - Unit commits
+  - Separar commits
+
+  Actualizando una rama
+  Estamos aquí:
+  git lg
+
+  * 158ba9e - (4 años, y 3 meses atrás) Se agrego a la liga: Volcán Negro - Strider (HEAD -> master)
+  * 300c014 - (4 años, y 3 meses atrás) Misiones nuevas agregadas - Strider
+  | * 8e755a3 - (4 años, y 3 meses atrás) Actualizamos dos misiones completadas al momento - Strider (rama-A)
+  | * cc55aaf - (4 años, y 3 meses atrás) Agregamos el archivo de las misiones completadas - Strider
+  |/  
+  * acea380 - (4 años, y 3 meses atrás) Actualización de las misiones - Strider
+
+  Tenemos que posicionarnos en la rama en la que queremos hacer el rebase, en este caso rama_A
+  git checkout rama_A
+  git rebase master
+
+  Acabamos aquí
+  git lg
+
+  * 871cc43 - (4 años, y 3 meses atrás) Actualizamos dos misiones completadas al momento - Strider (HEAD -> rama-A)
+  * 4a8f4ad - (4 años, y 3 meses atrás) Agregamos el archivo de las misiones completadas - Strider
+  * 158ba9e - (4 años, y 3 meses atrás) Se agrego a la liga: Volcán Negro - Strider (master)
+  * 300c014 - (4 años, y 3 meses atrás) Misiones nuevas agregadas - Strider
+  * acea380 - (4 años, y 3 meses atrás) Actualización de las misiones - Strider
+  * 31efae8 - (4 años, y 3 meses atrás)
+
+  Accedemos a la rama master
+  git checkout master
+  Hacemos merge
+  git merge rama_A
+
+  Y tras el merge (hace un fast-forward)
+  git lg
+
+  * 871cc43 - (4 años, y 3 meses atrás) Actualizamos dos misiones completadas al momento - Strider (HEAD -> master, rama-misiones-completadas)
+  * 4a8f4ad - (4 años, y 3 meses atrás) Agregamos el archivo de las misiones completadas - Strider
+  * 158ba9e - (4 años, y 3 meses atrás) Se agrego a la liga: Volcán Negro - Strider
+  * 300c014 - (4 años, y 3 meses atrás) Misiones nuevas agregadas - Strider
+  * acea380 - (4 años, y 3 meses atrás) Actualización de las misiones - Strider
+
+  Ahora se puede borrar la rama_A
+  git branch -d rama_A
+
+  El rebase normal ayuda bastante a actualizar el punto inicial de la rama.
+
+  NOTAS: 
+   - ~ es el carácter virgulilla
+   - Con el merge también se podría haber hecho, pero este caso es más fácil hacerlo con rebase. Para ver la diferencias:
+    https://www.atlassian.com/git/tutorials/merging-vs-rebasing
+    Pero se podría haber hecho con el merge y resolver conflictos.
+   - No se acostumbra a hacer mucho un rebase
+
+  REBASE - SQUASH
+  Este tipo de rebase se usa bastante.
+
+  Si tenemos dos commits cuyo nombre es casi igual, por ejemplo:
+  * 008af85 - (hace 4 segundos) Actualizamos misiones completadas - José Manuel Muñoz Manzano (HEAD -> master)
+  * 871cc43 - (4 años, y 3 meses atrás) Actualizamos dos misiones completadas al momento - Strider
+
+  Entonces esos dos commits deberían estar unidos porque es lo mismo. Deberían unificarse.
+  Esto se puede hacer de diferentes maneras. Una muy común es:
+  git rebase -i HEAD~4
+
+  -i porque es interactivo y se indica desde que commit se quiere empezar a hacer el rebase.
+  Se puede usar el HEAD, o un hash e incluso un tag.
+  En este caso se indican 4 commits antes del HEAD.
+
+  Se entra en un modo especial de edición donde aparece un comando, el hash y el nombre del commit.
+  Se pueden ver los comandos más abajo. Ahora es cuestión de usar los comandos y/o cambiar el nombre del commit...
+  Nos interesa el comando s, (squash), que coge 2 commits y los fusiona.
+  Por tanto, de aquí:
+  pick 158ba9e Se agrego a la liga: Volcán Negro
+  pick 4a8f4ad Agregamos el archivo de las misiones completadas
+  pick 871cc43 Actualizamos dos misiones completadas al momento
+  pick 008af85 Actualizamos misiones completadas
+
+  Pasamos aquí:
+  pick 158ba9e Se agrego a la liga: Volcán Negro
+  pick 4a8f4ad Agregamos el archivo de las misiones completadas
+  pick 871cc43 Actualizamos dos misiones completadas al momento
+  s 008af85 Actualizamos misiones completadas
+
+  Con sólo poner la s (o squash) ya fusiona el commit 008af85 con el anterior (871cc43)
+  Notar que si también se pusiera s al commit 871cc43, fusionaría los commits 008af85, 871cc43 y 4a8f4ad
+
+  No olvidar que para editar, hay que pulsar la tecla a, y cuando se termina hay que pulsar Esc, y luego :wq!
+  Aparece ahora otra edición muy parecida a la que se muestra cuando se hace un commit sin especificar el mensaje.
+  Se puede cambiar el mensaje que se muestra o dejarlo así. No olvidar, para guardar y salir: :wq!
+
+  Tras hacer git lg vemos:
+  * 2083b0c - (4 años, y 3 meses atrás) Actualizamos dos misiones completadas al momento - Strider (HEAD -> master)
+  * 4a8f4ad - (4 años, y 3 meses atrás) Agregamos el archivo de las misiones completadas - Strider
+
+  Se ha fusionado el commit, pero la información sigue bien.  
+
+  NOTA: Si se hizo un push entonces es mejor no tocar nada porque otra persona pudo haberlo descargado y se pueden 
+  crear conflictos que alguien va a tener que resolver. Igual si son commits muy antiguos en la línea del tiempo.
+
+  REBASE - REWORD
+  Si queremos cambiar el mensaje del commit, digamos de los dos últimos, habría que hacer lo siguiente:
+  git rebase -i HEAD~4
+
+  Entramos a la edición (ver REBASE - SQUASH) y se usará el comando r (o reword). NO SE CAMBIA EL MENSAJE TODAVIA.
+
+  pick 300c014 Misiones nuevas agregadas
+  pick 158ba9e Se agrego a la liga: Volcán Negro
+  r 4a8f4ad Agregamos el archivo de las misiones completadas
+  r 2083b0c Actualizamos dos misiones completadas al momento
+
+  Pulsamos Esc seguido de :wq!
+  Entramos a la siguiente edición y aquí SI SE CAMBIA EL MENSAJE.
+  Se entrará una vez por cada r a esta edición, es decir, en nuestro ejemplo 2 veces.
+
+  Tras los dos cambios queda:
+  * 36771b6 - (4 años, y 3 meses atrás) Misiones completadas actualizadas - Strider (HEAD -> master)
+  * f4c9694 - (4 años, y 3 meses atrás) Misiones-Completadas.md agregado - Strider
+
+  Notar que se actualiza el mensaje, no quien hizo el commit.
+
+  NOTA: Si se hizo un push entonces es mejor no tocar nada porque otra persona pudo haberlo descargado y se pueden 
+  crear conflictos que alguien va a tener que resolver. Igual si son commits muy antiguos en la línea del tiempo.
+
+  REBASE - EDIT
+  Es muy útil para separar commits.
+  Imaginemos que hacemos 3 cambios, cada uno de ellos en un archivo distinto.
+  Ahora queremos que cada cambio aparezca en 1 commit separado, es decir, queremos 3 commits.
+
+  Lo primero que vamos a hacer es desechar el cambio sobre 1 de los 3 archivos que se han modificado. Vamos a revertir los
+  cambios de 1 archivo.
+  git checkout -- <archivo>
+
+  Juntamos los otros 2 archivos en un único commit
+  git add .
+  git commit -m "commits"
+
+  Si no nos gusta el mensaje en el commit o vemos que los archivos no deberían estar en el mismo commit se puede hacer un
+  rebase interactivo o bien hacer un reset al commit anterior.
+  Si usamos el rebase interactivo:
+  git rebase -i HEAD~3
+
+  Tocamos en el editor la tecla a para empezar a editar.
+  Donde pone pick se cambia a e (o edit)
+  Como sólo quiero editar uno, pulso Esc seguido de :wq!
+
+  No hay más pantallas. Git indica que se puede hacer un git commit --amend para cambiar el mensaje o un git rebase --continue.
+  Esto se llama rebase manual, que se llama así porque tenemos que indicar al rebase (con --continue) que queremos continuar con
+  el siguiente paso.
+  Es muy importante hacer todos los pasos de una vez y no mezclar cosas. Por ejemplo, no hacer entre medias un git stash.
+  Si escribimos:
+  git status
+  Veremos que git indica que estamos en un rebase interactivo en progreso.
+
+  Como dijimos, no queremos que esos 2 archivos al que hicimos commit estén juntos en ese commit, así que escribimos:
+  git reset HEAD^
+  Ahora podemos añadir manualmente al stage el primer archivo.
+  git add archivo1
+  Y hacer su commit
+  git commit -m "texto archivo1"
+  Y agregamos el otro al stage y hacemos commit
+  git commit -am "texto archivo2"
+
+  Ya tenemos los dos commits separados.
+  Si hacemos git lg, veremos que están los dos commits, pero el HEAD y la rama master no están sincronizadas.
+  * 02dfdbb - (hace 20 segundos) Misiones actualizadas - José Manuel Muñoz Manzano (HEAD)
+  * 0a94c90 - (hace 66 segundos) Agregamos a Deadshot - José Manuel Muñoz Manzano
+  | * ebf46b3 - (hace 10 minutos) commits - José Manuel Muñoz Manzano (master)
+  |/  
+  * 36771b6 - (4 años, y 3 meses atrás) Misiones completadas actualizadas - Strider
+  * f4c9694 - (4 años, y 3 meses atrás) Misiones-Completadas.md agregado - Strider
+
+  Terminamos el rebase interactivo para corregir ese problema.
+  git rebase --continue
+  Y ya se sincroniza el HEAD con la rama master
+  * 02dfdbb - (hace 2 minutos) Misiones actualizadas - José Manuel Muñoz Manzano (HEAD -> master)
+  * 0a94c90 - (hace 3 minutos) Agregamos a Deadshot - José Manuel Muñoz Manzano
+  * 36771b6 - (4 años, y 3 meses atrás) Misiones completadas actualizadas - Strider
+  * f4c9694 - (4 años, y 3 meses atrás) Misiones-Completadas.md agregado - Strider
+
+  Si por alguna razón obtenemos un mensaje de error que indique que el HEAD está DETACHED del master, haremos:
+  git checkout master
+  Para mover el HEAD al master y ya podremos seguir trabajando.
+
+  NOTA: Si se hizo un push entonces es mejor no tocar nada porque otra persona pudo haberlo descargado y se pueden 
+  crear conflictos que alguien va a tener que resolver. Igual si son commits muy antiguos en la línea del tiempo.
+
+34) git fetch
+  Si en GitHub tenemos cambios que no tenemos en local, pero en local no queremos hacer un pull request porque puede hacer merge
+  que no queremos. Nosotros sólo queremos actualizar las referencias locales con los últimos cambios de GitHub.
+
+  git fetch
+
+  remote: Enumerating objects: 10, done.
+  remote: Counting objects: 100% (10/10), done.
+  remote: Compressing objects: 100% (8/8), done.
+  remote: Total 8 (delta 3), reused 0 (delta 0), pack-reused 0
+  Desempaquetando objetos: 100% (8/8), 2.40 KiB | 351.00 KiB/s, listo.
+  Desde https://github.com/JoseManuelMunozManzano/curso-git-liga-justicia
+    cbda4b2..b484d07  main       -> origin/main
+
+  Indica como último commit en local el b484d07, que es el último que aparece en GitHub también. El main apunta ahí.
+
+  Si hacemos git lg
+
+  * b484d07 - (hace 6 minutos) Delete flash.md - José Manuel Muñoz Manzano (origin/main, origin/HEAD)
+  * 3e20583 - (hace 7 minutos) Rename historia.flash.md to flash.md - José Manuel Muñoz Manzano
+  * f9e05ef - (hace 9 minutos) Create historia.flash.md - José Manuel Muñoz Manzano
+  * cbda4b2 - (hace 12 minutos) Cambiada extensión a .md - José Manuel Muñoz Manzano (HEAD -> main)
+
+  Vemos que el HEAD sigue donde estaba nuestro último commit, antes de hacer el git fetch.
+
+  Ahora se podría hacer un git pull 
+
+  Actualizando cbda4b2..b484d07
+  Fast-forward
+
+  Y tras git lg
+
+  * b484d07 - (hace 8 minutos) Delete flash.md - José Manuel Muñoz Manzano (HEAD -> main, origin/main, origin/HEAD)
+  * 3e20583 - (hace 9 minutos) Rename historia.flash.md to flash.md - José Manuel Muñoz Manzano
+
+  Todo queda actualizado.
+
+  NOTA: Hay mucha gente que prefiere hacer un git fetch antes de hacer un git pull para tener una idea de lo que va a suceder
+    antes de unir o entrar a un rebase del mismo.

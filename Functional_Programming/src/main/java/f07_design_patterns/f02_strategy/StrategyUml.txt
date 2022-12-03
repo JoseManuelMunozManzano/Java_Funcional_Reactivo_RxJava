@@ -1,0 +1,21 @@
+@startuml
+
+    class Context
+
+    interface Strategy {
+        solution()
+    }
+
+    class ConcreteStrategy1 {
+        solution()
+    }
+
+    class ConcreteStrategy2 {
+        solution()
+    }
+
+    Strategy <--* Context : strategy
+    ConcreteStrategy1 --> Strategy
+    ConcreteStrategy2 --> Strategy
+
+@enduml
